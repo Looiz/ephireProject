@@ -1,0 +1,151 @@
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import java.io.*;
+import java.net.*;
+
+import javax.swing.*;
+
+// Ephire Project. All rights reserved ElioLooiz 2k18
+
+public class ChatClient extends JFrame implements Runnable {
+
+	Socket socket;
+	JTextArea ta;
+	JButton send, logout;
+	JTextField tf;
+	
+	Thread thread;
+	
+	DataInputStream din;
+	DataOutputStream dout;
+	
+	String LoginName;
+	
+	
+	ChatClient (String login) throws UnknownHostException, IOException {
+		super(login);
+		LoginName = login;
+		
+		ta = new JTextArea(18, 50);
+		tf = new JTextField(50);
+		
+		send = new JButton("Send");
+		logout = new JButton("Logout");
+		
+	  
+		tf.addKeyListener(new SendKeyListener());
+		
+		send.addActionListener(new SendButtonListener());
+		logout.addActionListener(new LogoutButtonListener());
+		
+		
+		socket = new Socket("176.124.19.195", 5217);              // connection address + port
+		
+		din = new DataInputStream(socket.getInputStream());
+		dout = new DataOutputStream(socket.getOutputStream());
+		
+		
+		
+		dout.writeUTF(LoginName);                                  // sending user information to the ChatServer
+		dout.writeUTF(LoginName + " " + "LOGIN");
+		
+		thread = new Thread(this);
+		thread.start();
+		setup();
+	}
+	
+	private void setup() {
+	
+		setSize (600,400);
+		
+		JPanel panel = new JPanel();
+		
+		
+		panel.add(new JScrollPane(ta));
+		panel.add(tf);
+		panel.add(send);
+		panel.add(logout);
+        setUndecorated(true);    // X
+		add(panel);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		setVisible(true);
+		
+	}
+
+	@Override
+	public void run() {                             // messages getter
+		
+		while(true) {
+			
+			try {
+				ta.append("\n" + din.readUTF());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+
+	
+	public class SendButtonListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			try {
+				dout.writeUTF(LoginName + " " + "DATA " + tf.getText().toString());
+				tf.setText("");
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+		}
+	}
+	public class LogoutButtonListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			try {
+				dout.writeUTF(LoginName + " " + "LOGOUT");
+				
+				System.exit(1);
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+		}
+	}
+	public class SendKeyListener implements KeyListener {
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				try {
+					dout.writeUTF(LoginName + " " + "DATA " + tf.getText().toString());
+					tf.setText("");
+				} catch (IOException e1) {
+					
+					e1.printStackTrace();
+				}
+			}
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			// TODO Auto-generated method stub
+			
+		}}
+}
