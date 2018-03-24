@@ -1,0 +1,62 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DBCheck {
+
+	private static final String url = "jdbc:mysql://localhost:3306/ephire";
+    private static final String user = "root";
+    private static final String password = "root";
+    private static final String query = "select login, password from users";
+    private int available;
+   
+    private static Connection con;
+    private static Statement stmt;
+    private static ResultSet rs;
+    
+    private String clientLogin;
+    private String clientPassword;
+    
+    public String isAvailable(String log, String pas) {
+    	
+    	clientLogin = log;
+		clientPassword = pas;
+		
+    	try {
+        	// opening database connection to MySQL server
+            con = DriverManager.getConnection(url, user, password);
+
+            // getting Statement object to execute query
+            stmt = con.createStatement();
+
+            // executing SELECT query
+            rs = stmt.executeQuery(query);
+            System.out.println(clientLogin + " - " + clientPassword);
+            while (rs.next()) {
+            	
+                String RegistredLogin = rs.getString("login");
+                String RegistredPassword = rs.getString("password");
+                if(clientLogin.equals(RegistredLogin)&&(clientPassword.equals(RegistredPassword))) {available = 1;}
+                
+                }
+        	} catch(SQLException sqlEx) {sqlEx.printStackTrace();}
+        
+        finally {
+        	    try { con.close(); } catch(SQLException se)     { /*can't do anything */ }
+                try { stmt.close(); } catch(SQLException se)    { /*can't do anything */ }
+                try { rs.close(); } catch(SQLException se)      { /*can't do anything */ }			        	
+        }
+    	
+    	System.out.println("DataBaseCheck finished with code " + available);
+    	
+    	if(available == 1) return "confirmed";
+    	else return "unf";                                      // User not found
+    }
+    
+	 DBCheck() {
+		 System.out.println("DataBaseCheck starting...");
+		 available = 0;
+	 }
+}
