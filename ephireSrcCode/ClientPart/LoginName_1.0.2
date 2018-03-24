@@ -1,0 +1,140 @@
+// Ephire - Эфир 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
+public class LoginMenu extends JFrame{
+
+	private JPanel panel;
+	private JTextField loginField;
+	private JPasswordField passwordField;
+	private JButton enter;
+	private JLabel lblNewLabel;
+	
+	LoginMenu() {
+		super("LoginMenu");
+		setResizable(false);
+		
+		
+		setup();
+		
+	}
+	
+	
+	private void setup() {
+		panel = new JPanel();
+		
+		setSize(500,800);
+		
+		getContentPane().add(panel);
+		panel.setLayout(null);
+		
+		loginField = new JTextField();
+		loginField.setHorizontalAlignment(SwingConstants.CENTER);
+		loginField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		loginField.setBackground(new Color(0, 153, 102));
+		loginField.setBounds(100, 292, 300, 30);
+		panel.add(loginField);
+		loginField.setColumns(10);
+		
+		passwordField = new JPasswordField();
+		passwordField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		passwordField.setHorizontalAlignment(SwingConstants.CENTER);
+		passwordField.setBackground(new Color(255, 153, 51));
+		passwordField.setBounds(100, 333, 300, 30);
+		panel.add(passwordField);
+		
+		enter = new JButton("");
+		enter.setForeground(Color.WHITE);
+		enter.setBackground(Color.BLUE);
+		enter.setIcon(new ImageIcon("loginButton.jpg"));
+		enter.setBounds(156, 427, 180, 50);
+		enter.addActionListener(new EnterButtonActionListener());
+		enter.addKeyListener(new EnterButtonKeyListener());
+		panel.add(enter);
+		
+		lblNewLabel = new JLabel("");
+		lblNewLabel.setIcon(new ImageIcon("loginBackgroundMenu.jpg"));
+		lblNewLabel.setBounds(0, 0, 500, 800);
+		panel.add(lblNewLabel);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    setVisible(true);
+	}
+	
+	private JDialog createDialog(String title, boolean modal) 
+	  { 
+	      JDialog dialog = new JDialog(this, title, modal); 
+	      JLabel dialogLabel = new JLabel();
+	      dialogLabel.setText("Wrong Login or Password!");
+	      dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE); 
+	      dialog.setSize(180, 90); 
+	      return dialog; 
+	}
+	
+	
+	public static void main (String[] args) {
+       LoginMenu lm = new LoginMenu();
+	}
+	
+	class EnterButtonActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			try {
+				boolean isConfirmed = new ChatAccept().isAccept(loginField.getText(), passwordField.getText());
+				if(isConfirmed) {
+				    //ChatClient client = new ChatClient(loginField.getText());
+				     setVisible(false);
+				     dispose();
+				}
+				else {
+					JDialog dialog = createDialog("Error!", true);
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+   }
+	
+	class EnterButtonKeyListener implements KeyListener {
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			try {
+				boolean isConfirmed = new ChatAccept().isAccept(loginField.getText(), passwordField.getText());
+				if(isConfirmed) {
+				     //ChatClient client = new ChatClient(loginField.getText());
+				     setVisible(false);
+				     dispose();
+				}
+				else {
+					JDialog dialog = createDialog("Error!", true);
+				}
+				
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent arg0) {}
+
+		@Override
+		public void keyTyped(KeyEvent arg0) {}
+    	   
+       }
+}
+
