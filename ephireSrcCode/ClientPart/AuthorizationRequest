@@ -1,0 +1,50 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class AuthorizationRequest {
+
+	private DataInputStream din;
+	private DataOutputStream dout;
+	private Socket socket;
+	private String answer;
+	
+	
+	public boolean isAccept(String login, String password) throws IOException {
+		
+		
+		
+		dout.writeUTF(login);                        
+		dout.writeUTF(password);  // sending user information to the ChatServer. Needs to attach password sending
+		
+		answer = din.readUTF();
+		System.out.println(answer);
+	
+		
+		if(answer.equals("confirmed")) {
+			ChatClient client = new ChatClient(socket, dout, din, login);
+			return true;
+			}
+		
+		else {
+			//socket.close();
+			//din.close();
+			//dout.close();
+			return false;
+		}
+		
+		}
+	
+	AuthorizationRequest() throws UnknownHostException, IOException {
+	
+		Socket socket = new Socket("localhost", 5217);
+		din = new DataInputStream(socket.getInputStream());
+		dout = new DataOutputStream(socket.getOutputStream());
+		
+		
+		
+   }
+	
+}
